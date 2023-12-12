@@ -12,8 +12,6 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
  
  void main()
  {
-     gl_FragColor = texture2D(inputImageTexture, textureCoordinate).bgra;
- }
     gl_FragColor = texture2D(inputImageTexture, textureCoordinate).bgra;
 }
  );
@@ -184,6 +182,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
         {
             failureBlock(error);
         }
+        else
         {
             if(self.delegate && [self.delegate respondsToSelector:@selector(movieRecordingFailedWithError:)])
             {
@@ -221,7 +220,6 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     }
     
     /*
-    [compressionProperties setObject:[NSNumber numberWithInt: 2000000] forKey:AVVideoAverageBitRateKey];
      NSDictionary *videoCleanApertureSettings = [NSDictionary dictionaryWithObjectsAndKeys:
      [NSNumber numberWithInt:videoSize.width], AVVideoCleanApertureWidthKey,
      [NSNumber numberWithInt:videoSize.height], AVVideoCleanApertureHeightKey,
