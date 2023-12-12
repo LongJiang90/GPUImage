@@ -476,29 +476,28 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
                     NSLog(@"Problem appending audio buffer at time: %@", CFBridgingRelease(CMTimeCopyDescription(kCFAllocatorDefault, currentSampleTime)));
                 _paused = NO;
             }
+            else
+            {
+                //NSLog(@"Wrote an audio frame %@", CFBridgingRelease(CMTimeCopyDescription(kCFAllocatorDefault, currentSampleTime)));
+            }
+            
+            if (_shouldInvalidateAudioSampleWhenDone)
+            {
+                CMSampleBufferInvalidate(audioBuffer);
+            }
+            CFRelease(audioBuffer);
+        };
+        //        runAsynchronouslyOnContextQueue(_movieWriterContext, write);
+        if( _encodingLiveVideo )
+            
+        {
+            runAsynchronouslyOnContextQueue(_movieWriterContext, write);
         }
         else
         {
-            //NSLog(@"Wrote an audio frame %@", CFBridgingRelease(CMTimeCopyDescription(kCFAllocatorDefault, currentSampleTime)));
+            write();
         }
-        
-        if (_shouldInvalidateAudioSampleWhenDone)
-        {
-            CMSampleBufferInvalidate(audioBuffer);
-        }
-        CFRelease(audioBuffer);
-    };
-    //        runAsynchronouslyOnContextQueue(_movieWriterContext, write);
-    if( _encodingLiveVideo )
-        
-    {
-        runAsynchronouslyOnContextQueue(_movieWriterContext, write);
     }
-    else
-    {
-        write();
-    }
-}
 }
 
 - (void)enableSynchronizationCallbacks;
