@@ -37,7 +37,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
 {
     if (!(self = [super init]))
     {
-		return nil;
+        return nil;
     }
     
     _textureOptions = fboTextureOptions;
@@ -65,7 +65,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
 {
     if (!(self = [super init]))
     {
-		return nil;
+        return nil;
     }
 
     GPUTextureOptions defaultTextureOptions;
@@ -100,7 +100,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
 
     if (!(self = [self initWithSize:framebufferSize textureOptions:defaultTextureOptions onlyTexture:NO]))
     {
-		return nil;
+        return nil;
     }
 
     return self;
@@ -265,7 +265,9 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
     {
         return;
     }
-
+    if (framebufferReferenceCount < 1) {
+        return;
+    }
     NSAssert(framebufferReferenceCount > 0, @"Tried to overrelease a framebuffer, did you forget to call -useNextFrameForImageCapture before using -imageFromCurrentFramebuffer?");
     framebufferReferenceCount--;
     if (framebufferReferenceCount < 1)
@@ -439,6 +441,12 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 #endif
 }
 
+- (GLuint)texture;
+{
+//    NSLog(@"Accessing texture: %d from FB: %@", _texture, self);
+    return _texture;
+}
+
 - (CVPixelBufferRef )pixelBuffer;
 {
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
@@ -446,12 +454,6 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 #else
     return NULL; // TODO: do more with this on the non-texture-cache side
 #endif
-}
-
-- (GLuint)texture;
-{
-//    NSLog(@"Accessing texture: %d from FB: %@", _texture, self);
-    return _texture;
 }
 
 @end
