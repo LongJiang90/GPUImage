@@ -141,6 +141,7 @@ void setColorConversion709( GLfloat conversionMatrix[9] );
 /** This flips between the front and rear cameras
  */
 - (void)rotateCamera;
+- (void)switchCameraFrontAndBack;
 
 /// @name Benchmarking
 

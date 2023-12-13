@@ -413,6 +413,68 @@ void setColorConversion709( GLfloat conversionMatrix[9] )
     [self setOutputImageOrientation:_outputImageOrientation];
 }
 
+- (void)switchCameraFrontAndBack {
+
+    NSError *error;
+    AVCaptureDeviceInput *newVideoInput;
+    AVCaptureDevicePosition currentCameraPosition = self.cameraPosition;
+
+    if (currentCameraPosition == AVCaptureDevicePositionBack)
+    {
+        currentCameraPosition = AVCaptureDevicePositionFront;
+    }
+    else
+    {
+        currentCameraPosition = AVCaptureDevicePositionBack;
+    }
+
+    AVCaptureDevice *backFacingCamera = nil;
+    AVCaptureDeviceDiscoverySession *discoverySession = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeBuiltInWideAngleCamera] mediaType:AVMediaTypeVideo position:AVCaptureDevicePositionUnspecified];
+    NSArray *devices = discoverySession.devices;
+    for (AVCaptureDevice *device in devices)
+    {
+        if ([device position] == currentCameraPosition)
+        {
+            backFacingCamera = device;
+        }
+    }
+    newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:backFacingCamera error:&error];
+
+    if (newVideoInput != nil)
+    {
+        [_captureSession beginConfiguration];
+        [_captureSession removeInput:videoInput];
+        [self configSessionPreset:currentCameraPosition];
+        if ([_captureSession canAddInput:newVideoInput])
+        {
+            [_captureSession addInput:newVideoInput];
+            videoInput = newVideoInput;
+        }
+        else
+        {
+            [_captureSession addInput:videoInput];
+        }
+        [_captureSession commitConfiguration];
+    }
+
+    _inputCamera = backFacingCamera;
+    [self setOutputImageOrientation:self.outputImageOrientation];
+}
+
+- (void)configSessionPreset:(AVCaptureDevicePosition)currentPosition {
+    if (currentPosition == AVCaptureDevicePositionBack) {
+        if ([self.captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
+            [self setCaptureSessionPreset:AVCaptureSessionPreset1280x720];
+        }else if ([self.captureSession canSetSessionPreset:AVCaptureSessionPreset1920x1080]) {
+            [self setCaptureSessionPreset:AVCaptureSessionPreset1920x1080];
+        }else {
+            [self setCaptureSessionPreset: AVCaptureSessionPresetHigh];
+        }
+    } else {
+        [self setCaptureSessionPreset:AVCaptureSessionPresetPhoto];
+    }
+}
+
 - (AVCaptureDevicePosition)cameraPosition 
 {
     return [[videoInput device] position];
